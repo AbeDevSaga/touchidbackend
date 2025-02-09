@@ -1,6 +1,7 @@
 const express = require("express");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const sendEmail = require("../mailer");
 
 const router = express.Router();
 
@@ -23,6 +24,11 @@ router.post("/register", async (req, res) => {
     const token = jwt.sign({ userId: newUser._id }, "your_jwt_secret", {
       expiresIn: "1h",
     });
+
+    // Send welcome email after registration
+    const subject = "Welcome to Our Platform!";
+    const text = `Hello ${name},\n\nThank you for registering with us. We are excited to have you on board. Your registration was successful!`;
+    await sendEmail(email, subject, text);
 
     res.json({ message: "User registered successfully", token });
   } catch (error) {
