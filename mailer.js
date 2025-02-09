@@ -1,4 +1,4 @@
-require('dotenv').config();  // Ensure you load the environment variables
+require('dotenv').config(); 
 EMAIL_USER="abbed3803@gmail.com";
 EMAIL_PASS="swqt efwf tpzu dcgk";
 
