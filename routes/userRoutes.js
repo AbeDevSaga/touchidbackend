@@ -2,13 +2,29 @@ const express = require("express");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("../mailer");
+const RegistrationLink = require("../models/RegistrationLink");
 
 const router = express.Router();
 
-
-router.post("/register", async (req, res) => {
+router.post("/register/:token", async (req, res) => {
   try {
+    const { token } = req.params;
     const { name, email, phone } = req.body;
+
+    // Verify JWT token and check expiration
+    let decoded;
+    try {
+      decoded = jwt.verify(token, "your_jwt_secret");
+    } catch (err) {
+      return res.status(403).json({ message: "Invalid or expired registration link" });
+    }
+
+    // Check if the token exists, is not expired, and is not used
+    const link = await RegistrationLink.findOne({ token });
+
+    if (!link || link.expiresAt < new Date() || link.used) {
+      return res.status(403).json({ message: "Invalid or expired registration link" });
+    }
 
     // Check if user exists
     const existingUser = await User.findOne({ email });
@@ -20,8 +36,11 @@ router.post("/register", async (req, res) => {
     const newUser = new User({ name, email, phone });
     await newUser.save();
 
+    // Mark the link as used and remove it
+    await RegistrationLink.deleteOne({ token });
+
     // Generate JWT token
-    const token = jwt.sign({ userId: newUser._id }, "your_jwt_secret", {
+    const user_token = jwt.sign({ userId: newUser._id }, "your_jwt_secret", {
       expiresIn: "1h",
     });
 
@@ -30,7 +49,7 @@ router.post("/register", async (req, res) => {
     const text = `Hello ${name},\n\nThank you for registering with us. We are excited to have you on board. Your registration was successful!`;
     await sendEmail(email, subject, text);
 
-    res.json({ message: "User registered successfully", token });
+    res.json({ message: "User registered successfully", token:user_token });
   } catch (error) {
     res.status(500).json({ message: "Error registering user", error });
   }
