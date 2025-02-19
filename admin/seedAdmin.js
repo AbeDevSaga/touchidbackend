@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const seedAdmin = async () => {
   try {
     // Check if the admin already exists
-    const adminExists = await Admin.findOne({ email: "admin@example.com" });
+    const adminExists = await Admin.findOne({ email: "biometricinformation060@gmail.com" });
     if (adminExists) {
       console.log("Admin already exists in the database.");
       return;
