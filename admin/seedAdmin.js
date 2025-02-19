@@ -10,12 +10,12 @@ const seedAdmin = async () => {
       return;
     }
 
-    const hashedPassword = await bcrypt.hash("adminpassword", 10);
+    const hashedPassword = await bcrypt.hash("bio@metric", 10);
 
     // Create new admin user if not exists
     const admin = new Admin({
       name: "admin",
-      email: "admin@example.com",
+      email: "biometricinformation060@gmail.com",
       password: hashedPassword, 
     });
 
