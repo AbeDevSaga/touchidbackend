@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 // User Schema
 const userSchema = new mongoose.Schema({
     name: String,
-    email: { type: String, unique: true },
-    phone: String,
-    image: String, // To store image data
+    email: String,
+    phone: { type: String, unique: true },
+    image: String,
 });
 
 module.exports = mongoose.model('User', userSchema);

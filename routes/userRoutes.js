@@ -16,18 +16,22 @@ router.post("/register/:token", async (req, res) => {
     try {
       decoded = jwt.verify(token, "your_jwt_secret");
     } catch (err) {
-      return res.status(403).json({ message: "Invalid or expired registration link" });
+      return res
+        .status(403)
+        .json({ message: "Invalid or expired registration link" });
     }
 
     // Check if the token exists, is not expired, and is not used
     const link = await RegistrationLink.findOne({ token });
 
     if (!link || link.expiresAt < new Date() || link.used) {
-      return res.status(403).json({ message: "Invalid or expired registration link" });
+      return res
+        .status(403)
+        .json({ message: "Invalid or expired registration link" });
     }
 
     // Check if user exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ phone });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists." });
     }
@@ -45,11 +49,13 @@ router.post("/register/:token", async (req, res) => {
     });
 
     // Send welcome email after registration
-    const subject = "Welcome to Our Platform!";
-    const text = `Hello ${name},\n\nThank you for registering with us. We are excited to have you on board. Your registration was successful!`;
-    await sendEmail(email, subject, text);
+    if (email) {
+      const subject = "Welcome to Our Platform!";
+      const text = `Hello ${name},\n\nThank you for registering with us. We are excited to have you on board. Your registration was successful!`;
+      await sendEmail(email, subject, text);
+    }
 
-    res.json({ message: "User registered successfully", token:user_token });
+    res.json({ message: "User registered successfully", token: user_token });
   } catch (error) {
     res.status(500).json({ message: "Error registering user", error });
   }
@@ -73,11 +79,15 @@ router.post("/upload-image", async (req, res) => {
     user.image = imageData;
     await user.save();
 
-    res.json({ success: true, message: "Image captured and saved successfully" });
+    res.json({
+      success: true,
+      message: "Image captured and saved successfully",
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Error uploading image", error });
+    res
+      .status(500)
+      .json({ success: false, message: "Error uploading image", error });
   }
 });
-
 
 module.exports = router;
