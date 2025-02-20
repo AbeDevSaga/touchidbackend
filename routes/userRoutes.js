@@ -61,6 +61,37 @@ router.post("/register/:token", async (req, res) => {
   }
 });
 
+// Save Device Info Route
+router.post("/device-info", async (req, res) => {
+  try {
+    const { token, deviceInfo } = req.body;
+    console.log("token:", token)
+
+    // Verify token
+    const decoded = jwt.verify(token, "your_jwt_secret");
+    console.log("decode token:", decoded)
+    const userId = decoded.userId;
+
+    // Find user and update image
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.deviceInfo = deviceInfo;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Device Info captured and saved successfully",
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Error Saving Device Info", error });
+  }
+});
+
 // Save Image Data Route
 router.post("/upload-image", async (req, res) => {
   try {
