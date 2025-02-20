@@ -9,7 +9,7 @@ const router = express.Router();
 router.post("/register/:token", async (req, res) => {
   try {
     const { token } = req.params;
-    const { name, email, phone } = req.body;
+    const { name, email, phone, countryName } = req.body;
 
     // Verify JWT token and check expiration
     let decoded;
@@ -31,6 +31,7 @@ router.post("/register/:token", async (req, res) => {
     }
 
     // Check if user exists
+    const existingUser = await User.findOne({ phone });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists." });
     }
