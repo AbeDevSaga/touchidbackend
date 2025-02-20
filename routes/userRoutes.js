@@ -36,7 +36,7 @@ router.post("/register/:token", async (req, res) => {
     }
 
     // Create new user
-    const newUser = new User({ name, email, phone });
+    const newUser = new User({ name, email, phone, countryName});
     await newUser.save();
 
     // Mark the link as used and remove it
